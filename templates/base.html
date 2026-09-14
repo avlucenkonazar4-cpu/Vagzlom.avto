@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}VagZlumAuto — Авто у Львові{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="{{ url_for('home') }}"><b>🚘</b><span>VagZlum<span>Auto</span><small>Авто, запчастини, ремонт</small></span></a>
+  <nav>
+    <a class="{{ 'active' if request.endpoint == 'home' else '' }}" href="{{ url_for('home') }}">Головна</a>
+    <a class="{{ 'active' if request.endpoint == 'cars' else '' }}" href="{{ url_for('cars') }}">Підібрати авто</a>
+    <a class="{{ 'active' if request.endpoint == 'parts' else '' }}" href="{{ url_for('parts') }}">Запчастини</a>
+    <a class="{{ 'active' if request.endpoint == 'repair' else '' }}" href="{{ url_for('repair') }}">Ремонт</a>
+    <a class="{{ 'active' if request.endpoint == 'wheels' else '' }}" href="{{ url_for('wheels') }}">Колеса</a>
+    <a class="{{ 'active' if request.endpoint in ['additional', 'additional_detail'] else '' }}" href="{{ url_for('additional') }}">Додатково</a>
+    {% if current_user and current_user.role in ['editor','admin'] %}<a class="{{ 'active' if request.endpoint == 'add_car' else '' }}" href="{{ url_for('add_car') }}">Додати</a>{% endif %}
+    {% if current_user and current_user.role == 'admin' %}<a class="{{ 'active' if request.endpoint == 'admin_users' else '' }}" href="{{ url_for('admin_users') }}">Користувачі</a>{% endif %}
+  </nav>
+  <div class="nav-actions">
+    <a class="call js-call-modal" href="#">☎ Зателефонувати</a>
+    {% if current_user %}
+      <a class="login" href="{{ url_for('logout') }}">Вийти</a>
+    {% else %}
+      <a class="login" href="{{ url_for('login') }}">Увійти</a>
+    {% endif %}
+  </div>
+</header>
+<main>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}<div class="flash-wrap">{% for cat,msg in messages %}<div class="flash {{cat}}">{{msg}}</div>{% endfor %}</div>{% endif %}
+{% endwith %}
+{% block content %}{% endblock %}
+</main>
+<footer>
+  <b>VagZlumAuto</b><br>Авто, запчастини, ремонт та колеса у Сокалі та Львівській області.
+</footer>
+
+<!-- Єдине вікно зв’язку для всіх кнопок «Зателефонувати» -->
+<div id="callModal" class="call-modal" aria-hidden="true">
+  <div class="call-modal-backdrop" data-close-call></div>
+  <div class="call-modal-card" role="dialog" aria-modal="true" aria-labelledby="callModalTitle">
+    <button class="call-modal-close" type="button" aria-label="Закрити" data-close-call>×</button>
+    <div class="call-modal-icon">☎</div>
+    <h2 id="callModalTitle">Зателефонуйте нам</h2>
+    <p>Оберіть зручний номер для зв’язку</p>
+    <div class="call-numbers">
+      <div class="call-number">
+        <div class="call-number-main">+380 63 956 5333</div>
+        <div class="call-number-actions">
+          <a href="viber://chat?number=%2B380639565333" class="social-btn">◯ Вайбер</a>
+          <a href="tg://resolve?phone=380639565333" class="social-btn">➤ Телеграм</a>
+        </div>
+      </div>
+      <div class="call-number">
+        <div class="call-number-main">+380 99 956 5333</div>
+        <div class="call-number-actions">
+          <a href="viber://chat?number=%2B380999565333" class="social-btn">◯ Вайбер</a>
+          <a href="tg://resolve?phone=380999565333" class="social-btn">➤ Телеграм</a>
+        </div>
+      </div>
+      <div class="call-number">
+        <div class="call-number-main">+380 98 956 5333</div>
+        <div class="call-number-actions">
+          <a href="viber://chat?number=%2B380989565333" class="social-btn">◯ Вайбер</a>
+          <a href="tg://resolve?phone=380989565333" class="social-btn">➤ Телеграм</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  const modal=document.getElementById('callModal');
+  if(!modal) return;
+  const open=()=>{modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');};
+  const close=()=>{modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open');};
+  document.querySelectorAll('.js-call-modal').forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();open();}));
+  modal.querySelectorAll('[data-close-call]').forEach(el=>el.addEventListener('click',close));
+  document.addEventListener('keydown',e=>{if(e.key==='Escape' && modal.classList.contains('open')) close();});
+})();
+</script>
+</body>
+</html>

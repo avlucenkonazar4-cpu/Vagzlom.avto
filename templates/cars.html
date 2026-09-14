@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Підібрати авто — VagZlumAuto{% endblock %}
+{% block content %}
+<section class="page-head catalog-head">
+  <div class="eyebrow">Каталог</div>
+  <h1>Підібрати авто</h1>
+  <p>Оберіть марку та модель автомобіля</p>
+</section>
+
+<div class="model-picker cards">
+  {% set quick_models = [
+    ("GOLF", "Golf", "Volkswagen", true),
+    ("JETTA", "Jetta", "Volkswagen", true),
+    ("PASSAT", "Passat", "Volkswagen", true),
+    ("TOURAN", "Touran", "Volkswagen", true),
+    ("RENAULT", "", "Renault", false),
+    ("FORD", "", "Ford", false),
+    ("DACIA", "", "Dacia", false)
+  ] %}
+  {% for title, label, brand_key, is_model in quick_models %}
+    <a class="car-card model-card {% if selected_brand == brand_key and (not is_model or selected_model) %}active{% endif %}"
+       href="{{ url_for('home', brand=brand_key, model=(label if is_model else '')) }}"
+       aria-label="Показати {{ title }}">
+      <div class="no-photo">🚗</div>
+      <div class="car-body">
+        <h3>{{ title }}</h3>
+        <span class="model-link">Показати авто ›</span>
+      </div>
+    </a>
+  {% endfor %}
+</div>
+
+<div class="model-search-link">
+  <a class="btn" href="{{ url_for('cars') }}">Показати всі авто ›</a>
+</div>
+
+<div class="cards">
+{% for car in cars %}
+  <article class="car-card">
+    {% if car.photo %}<a href="{{ url_for('car_detail', car_id=car.id) }}"><img src="{{ url_for('static', filename='uploads/' + car.photo) }}" alt="{{ car.brand }} {{ car.model }}"></a>{% else %}<a href="{{ url_for('car_detail', car_id=car.id) }}"><div class="no-photo">🚘</div></a>{% endif %}
+    <div class="car-body">
+      <span class="tag">{{car.brand}}</span>
+      <h3>{{car.model}}</h3>
+      <div class="specs">{{car.year or '—'}} · {{car.mileage or '—'}} км</div>
+      <strong>{{ "{:,.0f}".format(car.price).replace(",", " ") if car.price else "Ціна за запитом" }}{% if car.price %} доларів США{% endif %}</strong>
+      <a class="btn detail-btn" href="{{ url_for('car_detail', car_id=car.id) }}">Детальніше ›</a>
+    </div>
+  </article>
+{% endfor %}
+</div>
+
+{% endblock %}
